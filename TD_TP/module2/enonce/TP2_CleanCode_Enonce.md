@@ -1,6 +1,7 @@
 # TP 2 — Nettoyer BiblioTech
 
 ## Génie Logiciel et Qualité — M1 MIAGE
+
 **Durée : 1h30 | Projet : BiblioTech**
 
 ---
@@ -42,17 +43,17 @@ Ouvrez le fichier `pom.xml` et ajoutez les plugins suivants dans la section `<bu
     </configuration>
 </plugin>
 
-<!-- PMD -->
+        <!-- PMD -->
 <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-pmd-plugin</artifactId>
-    <version>3.21.2</version>
-    <configuration>
-        <rulesets>
-            <ruleset>pmd-rules.xml</ruleset>
-        </rulesets>
-        <failOnViolation>false</failOnViolation>
-    </configuration>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-pmd-plugin</artifactId>
+<version>3.21.2</version>
+<configuration>
+    <rulesets>
+        <ruleset>pmd-rules.xml</ruleset>
+    </rulesets>
+    <failOnViolation>false</failOnViolation>
+</configuration>
 </plugin>
 ```
 
@@ -63,8 +64,8 @@ Créez le fichier `checkstyle.xml` à la racine du projet :
 ```xml
 <?xml version="1.0"?>
 <!DOCTYPE module PUBLIC
-    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
-    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
     <module name="TreeWalker">
@@ -75,7 +76,7 @@ Créez le fichier `checkstyle.xml` à la racine du projet :
         <module name="MethodName"/>
         <module name="ParameterName"/>
         <module name="TypeName"/>
-        
+
         <!-- Taille -->
         <module name="MethodLength">
             <property name="max" value="30"/>
@@ -83,16 +84,16 @@ Créez le fichier `checkstyle.xml` à la racine du projet :
         <module name="ParameterNumber">
             <property name="max" value="4"/>
         </module>
-        
+
         <!-- Complexité -->
         <module name="CyclomaticComplexity">
             <property name="max" value="10"/>
         </module>
-        
+
         <!-- Imports -->
         <module name="UnusedImports"/>
         <module name="AvoidStarImport"/>
-        
+
         <!-- Bonnes pratiques -->
         <module name="EmptyBlock"/>
         <module name="NeedBraces"/>
@@ -100,7 +101,7 @@ Créez le fichier `checkstyle.xml` à la racine du projet :
             <property name="ignoreNumbers" value="-1, 0, 1, 2"/>
         </module>
     </module>
-    
+
     <!-- Longueur des fichiers -->
     <module name="FileLength">
         <property name="max" value="500"/>
@@ -115,9 +116,9 @@ Créez le fichier `pmd-rules.xml` à la racine du projet :
 ```xml
 <?xml version="1.0"?>
 <ruleset name="BiblioTech Rules"
-    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 
                         https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
 
     <description>Règles PMD pour BiblioTech</description>
@@ -180,10 +181,10 @@ mvn site
 
 **📝 À rendre :** Capture d'écran ou copie du résumé des violations.
 
-| Outil | Violations | Catégorie principale |
-|-------|------------|---------------------|
-| Checkstyle | ___ | ___ |
-| PMD | ___ | ___ |
+| Outil      | Violations | Catégorie principale |
+|------------|------------|----------------------|
+| Checkstyle | ___        | ___                  |
+| PMD        | ___        | ___                  |
 
 ---
 
@@ -193,13 +194,13 @@ mvn site
 
 Dans `LibraryManager.java`, renommez les éléments suivants :
 
-| Avant | Après | Justification |
-|-------|-------|---------------|
-| `p` (constante) | `PENALTY_RATE_PER_DAY` | Révèle l'intention |
-| `d1`, `d2`, `d3` | `STUDENT_LOAN_DURATION`, etc. | Explicite |
-| `calc()` | `calculatePenalty()` | Verbe + intention |
-| `chk()` | `canMemberBorrowBook()` | Question booléenne |
-| `m`, `b` (paramètres) | `member`, `book` | Lisibilité |
+| Avant                 | Après                         | Justification      |
+|-----------------------|-------------------------------|--------------------|
+| `p` (constante)       | `PENALTY_RATE_PER_DAY`        | Révèle l'intention |
+| `d1`, `d2`, `d3`      | `STUDENT_LOAN_DURATION`, etc. | Explicite          |
+| `calc()`              | `calculatePenalty()`          | Verbe + intention  |
+| `chk()`               | `canMemberBorrowBook()`       | Question booléenne |
+| `m`, `b` (paramètres) | `member`, `book`              | Lisibilité         |
 
 **Raccourci IntelliJ :** `Shift + F6` pour renommer en toute sécurité.
 
@@ -214,10 +215,10 @@ Dans la méthode `createLoan()`, extrayez les méthodes suivantes :
 public String createLoan(String memberId, String bookId) {
     Member member = findMemberOrThrow(memberId);
     Book book = findBookOrThrow(bookId);
-    
+
     validateMemberCanBorrow(member);
     validateBookAvailable(book);
-    
+
     return processLoanCreation(member, book);
 }
 
@@ -252,21 +253,26 @@ Créez les classes suivantes en déplaçant le code approprié :
 #### `BookService.java`
 
 ```java
-package com.bibliotech.service;
+package fr.amu.univ.miage.m1.glq.service;
 
 public class BookService {
     private Map<String, Book> books = new HashMap<>();
-    
-    public String addBook(String title, String author, String isbn, 
+
+    public String addBook(String title, String author, String isbn,
                           int year, int copies, String category) {
         // Déplacer le code de LibraryManager.addBook()
     }
-    
+
     public Book getBook(String id) { /* ... */ }
+
     public Book getBookByIsbn(String isbn) { /* ... */ }
+
     public List<Book> getAllBooks() { /* ... */ }
+
     public List<Book> searchBooks(String query) { /* ... */ }
+
     public void updateBook(Book book) { /* ... */ }
+
     public void deleteBook(String id) { /* ... */ }
 }
 ```
@@ -274,16 +280,16 @@ public class BookService {
 #### `MemberService.java`
 
 ```java
-package com.bibliotech.service;
+package fr.amu.univ.miage.m1.glq.service;
 
 public class MemberService {
     private Map<String, Member> members = new HashMap<>();
-    
-    public String addMember(String firstName, String lastName, 
+
+    public String addMember(String firstName, String lastName,
                             String email, String type) {
         // Déplacer le code de LibraryManager.addMember()
     }
-    
+
     public Member getMember(String id) { /* ... */ }
     // etc.
 }
@@ -292,12 +298,12 @@ public class MemberService {
 #### `PenaltyCalculator.java`
 
 ```java
-package com.bibliotech.service;
+package fr.amu.univ.miage.m1.glq.service;
 
 public class PenaltyCalculator {
     private static final double PENALTY_RATE_PER_DAY = 0.50;
     private static final double MAX_PENALTY = 50.0;
-    
+
     public double calculate(Member member, int daysOverdue) {
         // Déplacer et refactorer calculatePenalty()
     }
@@ -306,7 +312,7 @@ public class PenaltyCalculator {
 
 **📝 À faire :**
 
-1. Créez les 3 classes dans le package `com.bibliotech.service`
+1. Créez les 3 classes dans le package `fr.amu.univ.miage.m1.glq.service`
 2. Utilisez `F6` pour déplacer les méthodes
 3. Mettez à jour les références dans `LibraryManager`
 4. Relancez les tests
@@ -320,6 +326,7 @@ public class PenaltyCalculator {
 Dans `pom.xml`, ajoutez :
 
 ```xml
+
 <dependency>
     <groupId>com.tngtech.archunit</groupId>
     <artifactId>archunit-junit5</artifactId>
@@ -333,7 +340,7 @@ Dans `pom.xml`, ajoutez :
 Créez `src/test/java/com/bibliotech/architecture/ArchitectureTest.java` :
 
 ```java
-package com.bibliotech.architecture;
+package fr.amu.univ.miage.m1.glq.architecture;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
@@ -351,21 +358,21 @@ class ArchitectureTest {
     @BeforeAll
     static void setUp() {
         classes = new ClassFileImporter()
-            .importPackages("com.bibliotech");
+                .importPackages("fr.amu.univ.miage.m1.glq");
     }
 
     // ══════════════════════════════════════════════════════════════
     // TEST 1 : Les services ne doivent pas dépendre de la couche DB
     // ══════════════════════════════════════════════════════════════
-    
+
     @Test
     void services_should_not_depend_on_database_layer() {
         // TODO : Compléter cette règle
         ArchRule rule = noClasses()
-            .that().resideInAPackage("..service..")
-            .should().dependOnClassesThat()
-            .resideInAPackage("..db..");
-        
+                .that().resideInAPackage("..service..")
+                .should().dependOnClassesThat()
+                .resideInAPackage("..db..");
+
         // Note : Ce test échouera probablement !
         // C'est normal, le code legacy viole cette règle.
         // rule.check(classes);
@@ -374,27 +381,27 @@ class ArchitectureTest {
     // ══════════════════════════════════════════════════════════════
     // TEST 2 : Les modèles ne doivent pas avoir de dépendances
     // ══════════════════════════════════════════════════════════════
-    
+
     @Test
     void models_should_not_have_dependencies_to_services() {
         ArchRule rule = noClasses()
-            .that().resideInAPackage("..model..")
-            .should().dependOnClassesThat()
-            .resideInAnyPackage("..service..", "..db..");
-        
+                .that().resideInAPackage("..model..")
+                .should().dependOnClassesThat()
+                .resideInAnyPackage("..service..", "..db..");
+
         rule.check(classes);
     }
 
     // ══════════════════════════════════════════════════════════════
     // TEST 3 : Pas d'injection de champs (préférer constructeur)
     // ══════════════════════════════════════════════════════════════
-    
+
     @Test
     void no_field_injection() {
         ArchRule rule = noFields()
-            .should().beAnnotatedWith("org.springframework.beans.factory.annotation.Autowired")
-            .orShould().beAnnotatedWith("javax.inject.Inject");
-        
+                .should().beAnnotatedWith("org.springframework.beans.factory.annotation.Autowired")
+                .orShould().beAnnotatedWith("javax.inject.Inject");
+
         rule.check(classes);
     }
 
@@ -407,13 +414,13 @@ class ArchitectureTest {
         // TODO : Écrire une règle qui vérifie que les classes
         // dans le package "service" ont un nom se terminant par "Service"
         // ou "Manager" ou "Calculator"
-        
+
         ArchRule rule = classes()
-            .that().resideInAPackage("..service..")
-            .should().haveSimpleNameEndingWith("Service")
-            .orShould().haveSimpleNameEndingWith("Manager")
-            .orShould().haveSimpleNameEndingWith("Calculator");
-        
+                .that().resideInAPackage("..service..")
+                .should().haveSimpleNameEndingWith("Service")
+                .orShould().haveSimpleNameEndingWith("Manager")
+                .orShould().haveSimpleNameEndingWith("Calculator");
+
         // rule.check(classes);
     }
 
@@ -421,14 +428,14 @@ class ArchitectureTest {
     void repository_classes_should_only_be_accessed_by_services() {
         // TODO : Écrire une règle qui vérifie que les classes
         // contenant "Repository" ne sont appelées que depuis "service"
-        
+
         // Indice : utiliser onlyBeAccessed().byAnyPackage()
     }
 
     @Test
     void no_cycles_between_packages() {
         // TODO : Vérifier qu'il n'y a pas de dépendances cycliques
-        // Indice : utiliser slices().matching("com.bibliotech.(*)..").should().beFreeOfCycles()
+        // Indice : utiliser slices().matching("fr.amu.univ.miage.m1.glq.(*)..").should().beFreeOfCycles()
     }
 }
 ```
@@ -442,13 +449,13 @@ class ArchitectureTest {
 
 **📝 À rendre :**
 
-| Règle | Statut | Violations |
-|-------|--------|------------|
-| Services sans DB | ❌ | LibraryManager dépend de DatabaseConnection |
-| Models sans dépendances | ✅ | - |
-| Pas de field injection | ✅ | - |
-| Suffix Service | ? | |
-| Pas de cycles | ? | |
+| Règle                   | Statut | Violations                                  |
+|-------------------------|--------|---------------------------------------------|
+| Services sans DB        | ❌      | LibraryManager dépend de DatabaseConnection |
+| Models sans dépendances | ✅      | -                                           |
+| Pas de field injection  | ✅      | -                                           |
+| Suffix Service          | ?      |                                             |
+| Pas de cycles           | ?      |                                             |
 
 ---
 
@@ -468,14 +475,14 @@ class ArchitectureTest {
 
 ## Barème indicatif
 
-| Partie | Points |
-|--------|--------|
-| Configuration outils | 4 pts |
-| Renommage | 4 pts |
-| Extract Method | 5 pts |
-| SRP / Extract Class | 5 pts |
-| ArchUnit | 2 pts |
-| **Total** | **20 pts** |
+| Partie               | Points     |
+|----------------------|------------|
+| Configuration outils | 4 pts      |
+| Renommage            | 4 pts      |
+| Extract Method       | 5 pts      |
+| SRP / Extract Class  | 5 pts      |
+| ArchUnit             | 2 pts      |
+| **Total**            | **20 pts** |
 
 ---
 
