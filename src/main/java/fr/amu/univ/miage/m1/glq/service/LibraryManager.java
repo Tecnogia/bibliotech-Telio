@@ -24,6 +24,7 @@ public class LibraryManager {
     private final BookService bookService = new BookService();
     private final MemberService memberService = new MemberService();
     private final PenaltyCalculator penaltyCalculator = new PenaltyCalculator();
+    private final NotificationService notificationService = new NotificationService();
     private Map<String, Loan> loans = new HashMap<>();
     private Map<String, Reservation> reservations = new HashMap<>();
     private int loanIdCounter = 1;
@@ -50,14 +51,21 @@ public class LibraryManager {
 
     // ==================== GESTION DES LIVRES ====================
 
-    private static void ensureMemberIsActive(Member member) {
+    private Reservation getBookFirstReservation(List<Reservation> bookReservations) {
+        // Trier par date
+        bookReservations.sort((r1, r2) -> r1.getReservationDate().compareTo(r2.getReservationDate()));
+        Reservation firstReservation = bookReservations.get(0);
+        return firstReservation;
+    }
+
+    private void ensureMemberIsActive(Member member) {
         // Vérifier si le membre est actif
         if (!member.isActive()) {
             throw new RuntimeException("Le membre " + member.getId() + " n'est pas actif");
         }
     }
 
-    private static void ensureMembershipNotExpired(Member member) {
+    private void ensureMembershipNotExpired(Member member) {
         // Vérifier si l'adhésion n'est pas expirée
         if (member.getMembershipExpiryDate() != null
                 && member.getMembershipExpiryDate().before(new Date())) {
@@ -65,14 +73,14 @@ public class LibraryManager {
         }
     }
 
-    private static void checkBookActiveStatus(Book book) {
+    private void checkBookActiveStatus(Book book) {
         // Vérifier si le livre est actif
         if (!book.isActive()) {
             throw new RuntimeException("Le livre " + book.getId() + " n'est plus disponible au prêt");
         }
     }
 
-    private static void checkBookAvailability(Book book) {
+    private void checkBookAvailability(Book book) {
         // Vérifier la disponibilité
         if (book.getAvailableCopies() <= 0) {
             // Proposer une réservation
@@ -80,21 +88,14 @@ public class LibraryManager {
         }
     }
 
-    private static Reservation getBookFirstReservation(List<Reservation> bookReservations) {
-        // Trier par date
-        bookReservations.sort((r1, r2) -> r1.getReservationDate().compareTo(r2.getReservationDate()));
-        Reservation firstReservation = bookReservations.get(0);
-        return firstReservation;
-    }
-
-    private static void ensureBookIsNotReservedByAnotherMember(
+    private void ensureBookIsNotReservedByAnotherMember(
             String memberId, Reservation firstReservation) {
         if (!firstReservation.getMemberId().equals(memberId)) {
             throw new RuntimeException("Ce livre est réservé par un autre membre");
         }
     }
 
-    private static void markReservationAsFullfilled(Reservation firstReservation) {
+    private void markReservationAsFullfilled(Reservation firstReservation) {
         // Marquer la réservation comme fulfilled
         firstReservation.setStatus("FULFILLED");
     }
@@ -303,7 +304,7 @@ public class LibraryManager {
         saveLoan(createdLoan);
         updateBookAvailableCopies(book);
         updateMemberLoanInformations(member);
-        sendNotification(member, book, createdLoan);
+        notificationService.sendNotification(member, book, createdLoan);
 
         return createdLoan.getId();
     }
@@ -331,12 +332,7 @@ public class LibraryManager {
 
     private void sendNotification(Member member, Book book, Loan loan) {
         // Envoyer une notification (simulation)
-        sendNotification(
-                member.getEmail(),
-                "Emprunt confirmé",
-                "Vous avez emprunté : " + book.getTitle() + ". Date de retour : " + loan.getDueDate());
-
-        System.out.println("Emprunt créé : " + loan);
+        notificationService.sendNotification(member, book, loan);
     }
 
     /**
@@ -363,7 +359,7 @@ public class LibraryManager {
             member.setLateReturnsCount(member.getLateReturnsCount() + 1);
 
             // Notification de pénalité
-            sendNotification(
+            notificationService.sendNotification(
                     member.getEmail(),
                     "Retour en retard",
                     "Votre retour est en retard de "
@@ -430,7 +426,7 @@ public class LibraryManager {
 
         loan.renew();
 
-        sendNotification(
+        notificationService.sendNotification(
                 loan.getMember().getEmail(),
                 "Emprunt renouvelé",
                 "Votre emprunt a été renouvelé. Nouvelle date de retour : " + loan.getDueDate());
@@ -512,7 +508,7 @@ public class LibraryManager {
 
         reservations.put(id, reservation);
 
-        sendNotification(
+        notificationService.sendNotification(
                 member.getEmail(),
                 "Réservation confirmée",
                 "Vous avez réservé : " + book.getTitle() + ". Position dans la file : " + position);
@@ -560,7 +556,7 @@ public class LibraryManager {
             Member member = memberService.getMembers().get(nextReservation.getMemberId());
             Book book = bookService.getBooks().get(bookId);
 
-            sendNotification(
+            notificationService.sendNotification(
                     member.getEmail(),
                     "Livre disponible",
                     "Le livre que vous avez réservé est disponible : "
@@ -576,11 +572,7 @@ public class LibraryManager {
      */
     private void sendNotification(String email, String subject, String body) {
         // Simulation d'envoi d'email
-        System.out.println("=== EMAIL ===");
-        System.out.println("To: " + email);
-        System.out.println("Subject: " + subject);
-        System.out.println("Body: " + body);
-        System.out.println("=============");
+        notificationService.sendNotification(email, subject, body);
     }
 
     /**
@@ -599,7 +591,7 @@ public class LibraryManager {
                     Member member = loan.getMember();
                     Book book = loan.getBook();
 
-                    sendNotification(
+                    notificationService.sendNotification(
                             member.getEmail(),
                             "Rappel : retour proche",
                             "Votre emprunt de '"
@@ -626,7 +618,7 @@ public class LibraryManager {
                 int daysOverdue = loan.getDaysOverdue();
                 double penalty = penaltyCalculator.calculatePenalty(member, daysOverdue);
 
-                sendNotification(
+                notificationService.sendNotification(
                         member.getEmail(),
                         "RETARD : " + book.getTitle(),
                         "Votre emprunt est en retard de "
